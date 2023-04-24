@@ -1,0 +1,4 @@
+#+title: UML
+
+#+cation: uml
+[[img:output.png][uml]]

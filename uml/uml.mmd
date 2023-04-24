@@ -1,0 +1,132 @@
+classDiagram
+class Game {
+   -Window window
+   -VideoMode videoMode
+   -bool isPaused
+   -bool isFinished
+   -Clock clock
+   -Event sfmlEvent
+   -List~Level*~ levels
+   -int points
+   +init()
+   +isRunning()
+   +render()
+   +update()
+}
+class Level {
+   -Window window
+   -Turtle* turtle
+   +isColliding(bound1, bound2)
+}
+note for Level "Game logic goes in here"
+class Turtle {
+   -List~Texture~ textures
+   -pos initialPos
+   -isJumping()
+   -View view
+   -int life
+   +getPosBlock()
+   +getView()
+   +move(dir)
+   +jump()
+   +bool onGround();
+}
+class Babies {
+   +List~Baby~ babies
+}
+class Baby {
+   -pos initialPos
+   -bool inBubble
+   -View view
+   -int velocity
+   +bool onGround()
+   +getView()
+   +move(dir)
+   +turn(dir)
+}
+class Enemies {
+   +List~EnemyI*~ enemyIs
+   +List~EnemyII*~ enemyIIs
+   +Spawn()
+}
+class EnemyI {
+   -Sprite sprite
+   -int leftMargin
+   -int rightMargin
+   +getPos()
+   +move()
+   +getView()
+}
+class EnemyII {
+   -Sprite sprite
+   -int leftMargin
+   -int rightMargin
+   +getPos()
+   +move()
+   +isInjuring(bound turtlebound)
+   +getView()
+}
+class Collidable {
+   +view
+   +pos
+   +type
+   +index
+}
+class Collectibles {
+   +List~Collectible~ lst
+}
+class Collectible {
+   -Sprite sprite
+   -int value
+   -pos pos
+   +checkCollected()
+   +move()
+}
+class Ground{
+   +getView()
+   +getPos()
+}
+class Barriers{
+   +List~Barrier~ lst;
+}
+class Barrier{
+   -bool activated
+   +toggle()
+}
+class Blade{
+   -sprite
+   -pos
+}
+class Blocks{
+   +List~Block~ lst;
+}
+class Block{
+   -sprite
+   -pos
+   -bool isLifted
+   +getPos()
+   +setPos()
+}
+class PointerCursor {
+   -int angle
+   -sprite
+}
+Game *--> Level
+Level *--> Turtle
+Level *--> Babies
+Babies *--> Baby
+Enemies *--> EnemyI
+Enemies *--> EnemyII
+Level *--> Enemies
+Level *--> Ground
+Level *--> Barriers
+Level *--> Blocks
+Barriers *--> Barrier
+Blocks *--> Block
+Level *--> Blade
+Collectibles *--> Collectible
+Level *--> Collectibles
+Level *--> Collidable
+Game *--> Menu
+Game *--> Outro
+Level *--> PointerCursor
