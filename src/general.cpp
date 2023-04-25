@@ -21,3 +21,13 @@ string getExecutablePath() {
     }
     return "";
 }
+
+string removeFinalTwoDirsFromPath(string path){
+    vector<int> inds;
+    for(int i = 0; i < (int)path.size(); i++){
+        if(path[i] == '/'){
+            inds.push_back(i);
+        }
+    }
+    return path.substr(0, inds[(int)inds.size() - 2]);
+}

@@ -1,11 +1,12 @@
 #include "../include/game.h"
 #include "../include/general.h"
 
-int main(int argc, char *argv[]) {
+int main() {
     Game game;
     srand(time(NULL));
 
     while(game.isRunning()){
+        game.handleTime();
         game.update();
         game.render();
     }
