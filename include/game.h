@@ -4,12 +4,6 @@
 
 #include "general.h"
 #include "turtle.h"
-#include <SFML/Graphics.hpp>
-#include <SFML/Graphics/Drawable.hpp>
-#include <SFML/Graphics/RenderTarget.hpp>
-#include <SFML/Graphics/RenderWindow.hpp>
-#include <SFML/Window/Event.hpp>
-#include <SFML/Window/VideoMode.hpp>
 
 const int FRAME_RATE_LIMIT = 120;
 const std::string GAME_TITLE = "Turtix";
@@ -21,8 +15,6 @@ class Game{
     private:
         bool endGame;
         RenderWindow *window;
-        Clock clock;
-        float dt;
         VideoMode videoMode;
         View view;
         string path;
@@ -35,12 +27,15 @@ class Game{
         bool hasTimePassed();
         Turtle *turtle; // temp
     public:
+        bool keyPressed;
         Game();
         virtual ~Game();
         bool isRunning();
         void update();
         void render();
         void handleTime();
+        void turnOnKeyPress();
+        void turnOffKeyPress();
 };
 
 

@@ -5,12 +5,15 @@
 #include <vector>
 #include <unistd.h>
 #include <cstdlib>
+#include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 const int WIDTH = 1920;
 const int HEIGHT = 1080;
 const int MAX_PATH_SIZE = 2048;
 const int PERCENTAGE_AMOUNT = 100;
 const int GRID_SIZE = 100;
 const int NA = -1;
+const sf::Time TICKING_TIME = sf::milliseconds(50);
 const float GRID_SIZEF = static_cast<float>(GRID_SIZE);
 const std::string EXEC_LINK_PATH = "/proc/self/exe";
 const std::string DIR_DELIM = "/";

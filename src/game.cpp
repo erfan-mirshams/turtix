@@ -27,19 +27,19 @@ void Game::draw(RenderTarget *target, Sprite sprite){
     target -> draw(sprite);
 }
 
-void Game::handleTime(){
-    dt = clock.getElapsedTime().asSeconds();
-    clock.restart();
-}
-
 void Game::pollEvents(){
+    keyPressed = false;
     while(window -> pollEvent(sfmlEvent)){
         if(sfmlEvent.type == Event::Closed){
             endGame = true;
         }
         if(sfmlEvent.type == Event::KeyPressed){
+            keyPressed = true;
             if(sfmlEvent.key.code == Keyboard::D || sfmlEvent.key.code == Keyboard::Right || sfmlEvent.key.code == Keyboard::L){
-                turtle -> moveRight(dt);
+                turtle -> moveRight();
+            }
+            if(sfmlEvent.key.code == Keyboard::A || sfmlEvent.key.code == Keyboard::Left || sfmlEvent.key.code == Keyboard::H){
+                turtle -> moveLeft();
             }
         }
     }
@@ -50,6 +50,9 @@ void Game::update(){
         close();
     }
     pollEvents();
+    if(!keyPressed){
+        turtle -> fixTurtle();
+    }
     turtle -> incrementMovement();
 }
 

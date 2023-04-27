@@ -6,7 +6,6 @@ int main() {
     srand(time(NULL));
 
     while(game.isRunning()){
-        game.handleTime();
         game.update();
         game.render();
     }
