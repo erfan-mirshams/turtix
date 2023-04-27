@@ -22,8 +22,6 @@ class Turtle{
     int spriteInd;
     vector< vector<Texture*> > textures;
     Sprite *sprite;
-    Vector2i posGrid;
-    Vector2f posView;
     int accelerationY;
     int velocityY;
     int velocityX;
