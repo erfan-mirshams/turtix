@@ -13,6 +13,7 @@ using namespace std;
 
 class Game{
     private:
+        Clock clock;
         bool endGame;
         RenderWindow *window;
         VideoMode videoMode;
@@ -36,6 +37,7 @@ class Game{
         void turnOnKeyPress();
         void turnOffKeyPress();
         void setViewPos();
+        bool isTicked();
 };
 
 

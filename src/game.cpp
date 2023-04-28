@@ -1,5 +1,6 @@
 #include "../include/general.h"
 #include "../include/game.h"
+#include <SFML/Window/Keyboard.hpp>
 
 void Game::initVariables(){
     endGame = false;
@@ -27,6 +28,7 @@ Game::Game(){
 void Game::pollEvents(){
     keyPressed = false;
     while(window -> pollEvent(sfmlEvent)){
+        clock.restart();
         if(sfmlEvent.type == Event::Closed){
             endGame = true;
         }
@@ -37,6 +39,15 @@ void Game::pollEvents(){
             }
             if(sfmlEvent.key.code == Keyboard::A || sfmlEvent.key.code == Keyboard::Left || sfmlEvent.key.code == Keyboard::H){
                 turtle -> moveLeft();
+            }
+        }
+        if(sfmlEvent.type == Event::KeyReleased){
+            keyPressed = true;
+            if(sfmlEvent.key.code == Keyboard::W || sfmlEvent.key.code == Keyboard::Up || sfmlEvent.key.code == Keyboard::K){
+                turtle -> jump();
+            }
+            if(sfmlEvent.key.code == Keyboard::Space){
+                turtle -> attack();
             }
         }
     }
@@ -70,17 +81,29 @@ void Game::update(){
         close();
     }
     pollEvents();
-    if(!keyPressed){
-        turtle -> fixTurtle();
+    if(!keyPressed && isTicked()){
+            turtle -> fixHorizontalMovement();
+            turtle -> fixTurtle();
     }
     turtle -> incrementMovement();
     setViewPos();
+}
+
+bool Game::isTicked(){
+    if(clock.getElapsedTime() >= LEVEL_TIMEOUT){
+        clock.restart();
+        return true;
+    }
+    return false;
 }
 
 void Game::render(){
     window -> clear();
     window -> setView(view);
     window -> draw(*(turtle -> getSprite()));
+    Vector2i pos;
+    pos = getPosGrid(turtle -> getSprite());
+    cout << "POS GRID: " << pos.x << " " << pos.y << endl;
     window -> setView(window -> getDefaultView());
     window -> display();
 }
