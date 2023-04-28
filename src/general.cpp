@@ -31,3 +31,8 @@ string removeFinalTwoDirsFromPath(string path){
     }
     return path.substr(0, inds[(int)inds.size() - 2]);
 }
+
+int calMod(int a, int b){
+    a += b;
+    return (a % b);
+}

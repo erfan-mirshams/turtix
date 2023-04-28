@@ -26,6 +26,7 @@ const std::string NAME_DELIM = "-";
 enum DIRECTION {RIGHT, LEFT};
 using namespace sf;
 using namespace std;
+int calMod(int a, int b);
 int percentage(int per, int amount);
 int randomIntBetween(int l, int r);
 string getExecutablePath();
