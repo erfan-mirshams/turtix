@@ -14,6 +14,7 @@ Menu::Menu(Font* gameFont){
         FloatRect rect = items[i] -> getLocalBounds();
         items[i] -> setPosition((WIDTH - rect.width) / 2, ((float)HEIGHT / (NUMBER_OF_ITEMS + 1) * (i + 1)));
     }
+    focusItem(NUMBER_OF_ITEMS - 1);
 }
 
 Menu::~Menu(){

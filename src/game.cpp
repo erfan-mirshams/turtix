@@ -33,7 +33,7 @@ void Game::pollEvents(){
     keyPressed = false;
     while(window -> pollEvent(sfmlEvent)){
         clock.restart();
-        if(sfmlEvent.type == Event::Closed){
+        if(sfmlEvent.type == Event::Closed || mode == IT_EXIT){
           endGame = true;
         }
         if(mode == IT_MENU){
@@ -47,6 +47,11 @@ void Game::pollEvents(){
                     sfmlEvent.key.code == Keyboard::Down ||
                     sfmlEvent.key.code == Keyboard::J) {
                     menu -> moveDown();
+                }
+                if (sfmlEvent.key.code == Keyboard::Enter ||
+                    sfmlEvent.key.code == Keyboard::Space ||
+                    sfmlEvent.key.code == Keyboard::L) {
+                    mode = (IT_MODE)menu -> getItem();
                 }
             }
         }
