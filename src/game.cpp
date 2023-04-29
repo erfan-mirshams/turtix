@@ -1,23 +1,20 @@
 #include "../include/general.h"
 #include "../include/game.h"
-#include <SFML/Window/Keyboard.hpp>
 
 void Game::initVariables(){
     endGame = false;
-    path = removeFinalTwoDirsFromPath(getExecutablePath());
-    turtle = new Turtle(path + DIR_DELIM + TEXTURES_DIR);
+    path = removeFinalTwoDirsFromPath(getExecutablePath()) + DIR_DELIM + RESOURCES_DIR;
     font = new Font();
     font -> loadFromFile(path + DIR_DELIM + FONTS_DIR + DIR_DELIM + FONTS_NAME);
     menu = new Menu(font);
-    mode = IT_MENU;
-}
-
-void Game::initWindow(){
+    view = new View();
     videoMode = VideoMode(WIDTH, HEIGHT);
-    view.setSize(WIDTH, HEIGHT);
-    view.setCenter(WIDTH / 2.0, HEIGHT / 2.0);
+    view -> setSize(WIDTH, HEIGHT);
+    view -> setCenter(WIDTH / 2.0, HEIGHT / 2.0);
     window = new RenderWindow(videoMode, GAME_TITLE, Style::None);
     window -> setFramerateLimit(FRAME_RATE_LIMIT);
+    mode = IT_MENU;
+    level = new Level(window, view, font, path);
 }
 
 bool Game::isRunning(){
@@ -26,7 +23,56 @@ bool Game::isRunning(){
 
 Game::Game(){
     initVariables();
-    initWindow();
+}
+
+void Game::menuHandleEvent(){
+    if (sfmlEvent.type == Event::KeyPressed) {
+        if (sfmlEvent.key.code == Keyboard::W ||
+            sfmlEvent.key.code == Keyboard::Up ||
+            sfmlEvent.key.code == Keyboard::K) {
+            menu->moveUp();
+        }
+        if (sfmlEvent.key.code == Keyboard::S ||
+            sfmlEvent.key.code == Keyboard::Down ||
+            sfmlEvent.key.code == Keyboard::J) {
+            menu->moveDown();
+        }
+        if (sfmlEvent.key.code == Keyboard::Enter ||
+            sfmlEvent.key.code == Keyboard::Space ||
+            sfmlEvent.key.code == Keyboard::L) {
+            mode = (IT_MODE)menu->getItem();
+        }
+    }
+}
+
+void Game::levelHandleEvent() {
+    if (sfmlEvent.type == Event::KeyPressed) {
+        keyPressed = true;
+        if (sfmlEvent.key.code == Keyboard::D ||
+            sfmlEvent.key.code == Keyboard::Right ||
+            sfmlEvent.key.code == Keyboard::L) {
+            level -> rightKeyPress();
+        }
+        if (sfmlEvent.key.code == Keyboard::A ||
+            sfmlEvent.key.code == Keyboard::Left ||
+            sfmlEvent.key.code == Keyboard::H) {
+            level -> leftKeyPress();
+        }
+        if (sfmlEvent.key.code == Keyboard::Q){
+            mode = IT_MENU;
+        }
+    }
+    if (sfmlEvent.type == Event::KeyReleased) {
+        keyPressed = true;
+        if (sfmlEvent.key.code == Keyboard::W ||
+            sfmlEvent.key.code == Keyboard::Up ||
+            sfmlEvent.key.code == Keyboard::K) {
+            level -> upKeyPress();
+        }
+        if (sfmlEvent.key.code == Keyboard::Space) {
+            level -> SpaceKeyPress();
+        }
+    }
 }
 
 void Game::pollEvents(){
@@ -37,74 +83,19 @@ void Game::pollEvents(){
           endGame = true;
         }
         if(mode == IT_MENU){
-            if(sfmlEvent.type == Event::KeyPressed) {
-                if (sfmlEvent.key.code == Keyboard::W ||
-                    sfmlEvent.key.code == Keyboard::Up ||
-                    sfmlEvent.key.code == Keyboard::K) {
-                    menu -> moveUp();
-                }
-                if (sfmlEvent.key.code == Keyboard::S ||
-                    sfmlEvent.key.code == Keyboard::Down ||
-                    sfmlEvent.key.code == Keyboard::J) {
-                    menu -> moveDown();
-                }
-                if (sfmlEvent.key.code == Keyboard::Enter ||
-                    sfmlEvent.key.code == Keyboard::Space ||
-                    sfmlEvent.key.code == Keyboard::L) {
-                    mode = (IT_MODE)menu -> getItem();
-                }
-            }
+            menuHandleEvent();
         }
-        else{
-            if(sfmlEvent.type == Event::KeyPressed) {
-                keyPressed = true;
-                if (sfmlEvent.key.code == Keyboard::D ||
-                    sfmlEvent.key.code == Keyboard::Right ||
-                    sfmlEvent.key.code == Keyboard::L) {
-                    turtle->moveRight();
-                }
-                if (sfmlEvent.key.code == Keyboard::A ||
-                    sfmlEvent.key.code == Keyboard::Left ||
-                    sfmlEvent.key.code == Keyboard::H) {
-                    turtle->moveLeft();
-                }
-            }
-            if (sfmlEvent.type == Event::KeyReleased) {
-                keyPressed = true;
-                if (sfmlEvent.key.code == Keyboard::W ||
-                    sfmlEvent.key.code == Keyboard::Up ||
-                    sfmlEvent.key.code == Keyboard::K) {
-                    turtle->jump();
-                }
-                if (sfmlEvent.key.code == Keyboard::Space) {
-                    turtle->attack();
-                }
-            }
+        if(mode == IT_PLAY){
+            levelHandleEvent();
         }
     }
 }
 
-void Game::setViewPos(){
-    Vector2i pos = getPosWindow(turtle -> getSprite());
-    Vector2f offset(0, 0);
-    int leftMargin = percentage(BOX_PERCENTAGE_LIMIT, WIDTH) + viewOffset.x;
-    if(pos.x < leftMargin){
-        offset.x = pos.x - leftMargin;
+void Game::levelUpdate(){
+    if (!keyPressed && isTicked()) {
+        level->fixTurtle();
     }
-    int rightMargin = percentage(PERCENTAGE_AMOUNT - BOX_PERCENTAGE_LIMIT, WIDTH) + viewOffset.x;
-    if(pos.x > rightMargin){
-        offset.x = pos.x - rightMargin;
-    }
-    int topMargin = percentage(BOX_PERCENTAGE_LIMIT, HEIGHT) + viewOffset.y;
-    if(pos.y < topMargin){
-        offset.y = pos.y - topMargin;
-    }
-    int bottomMargin = percentage(PERCENTAGE_AMOUNT - BOX_PERCENTAGE_LIMIT, HEIGHT) + viewOffset.y;
-    if(pos.y > bottomMargin){
-        offset.y = pos.y - bottomMargin;
-    }
-    view.setCenter(view.getCenter() + offset);
-    viewOffset += offset;
+    level->incrementMovements();
 }
 
 void Game::update(){
@@ -115,13 +106,10 @@ void Game::update(){
     if(mode == IT_MENU){
 
     }
+    if(mode == IT_PLAY){
+        levelUpdate();
+    }
     else{
-        if(!keyPressed && isTicked()){
-            turtle -> fixHorizontalMovement();
-            turtle -> fixTurtle();
-        }
-        turtle -> incrementMovement();
-        setViewPos();
     }
 }
 
@@ -133,26 +121,30 @@ bool Game::isTicked(){
     return false;
 }
 
+void Game::menuRender(){
+    menu -> draw(window);
+}
+
+void Game::levelRender(){
+    level -> draw();
+}
+
 void Game::render(){
-    window -> clear();
+    window -> clear(colors[mode]);
     if(mode == IT_MENU){
-        menu -> draw(window);
+        menuRender();
     }
-    else{
-        window->setView(view);
-        window->draw(*(turtle->getSprite()));
-        Vector2i pos;
-        pos = getPosGrid(turtle->getSprite());
-        cout << "POS GRID: " << pos.x << " " << pos.y << endl;
-        window->setView(window->getDefaultView());
+    if(mode == IT_PLAY){
+        levelRender();
     }
     window -> display();
 }
 
 Game::~Game(){
     delete window;
-    delete turtle;
     delete font;
+    delete level;
+    delete view;
 }
 
 void Game::close(){

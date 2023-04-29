@@ -3,17 +3,20 @@
 
 
 #include "general.h"
-#include "turtle.h"
 #include "menu.h"
+#include "level.h"
 
 const int FRAME_RATE_LIMIT = 120;
+const int NUMBER_OF_MODES = 5;
 const std::string GAME_TITLE = "Turtix";
-const std::string TEXTURES_DIR = "resources/textures";
-const std::string FONTS_DIR = "resources/fonts";
+const std::string RESOURCES_DIR = "resources";
+const std::string FONTS_DIR = "fonts";
 const std::string FONTS_NAME = "coffe-cake.ttf";
 enum IT_MODE{IT_MENU, IT_PLAY, IT_SHOP, IT_OUTRO, IT_EXIT};
 using namespace sf;
 using namespace std;
+
+const Color colors[NUMBER_OF_MODES] = {Color::Black, Color(36, 3, 28), Color::Black, Color::Black, Color::Black };
 
 class Game{
     private:
@@ -22,18 +25,18 @@ class Game{
         bool endGame;
         RenderWindow *window;
         VideoMode videoMode;
-        View view;
+        View* view;
+        Color windowColor;
         Vector2f viewOffset;
         string path;
         Event sfmlEvent;
         Font* font;
         IT_MODE mode;
+        Level* level;
         void initVariables();
-        void initWindow();
         void close();
         void pollEvents();
         bool hasTimePassed();
-        Turtle *turtle; // temp
     public:
         bool keyPressed;
         Game();
@@ -43,8 +46,12 @@ class Game{
         void render();
         void turnOnKeyPress();
         void turnOffKeyPress();
-        void setViewPos();
         bool isTicked();
+        void menuHandleEvent();
+        void menuRender();
+        void levelHandleEvent();
+        void levelUpdate();
+        void levelRender();
 };
 
 
