@@ -83,7 +83,8 @@ void Turtle::moveRight(){
     if(interrupt()){
         return;
     }
-    velocityX = INITIAL_VELOCITY_X;
+    velocityX = max(INITIAL_VELOCITY_X / 2, velocityX + INITIAL_ACCELERATION_X);
+    velocityX = min(INITIAL_VELOCITY_X, velocityX);
     action = TURT_RUN;
     if(dir == LEFT){
         cout << "LL" << endl;
@@ -96,7 +97,8 @@ void Turtle::moveLeft(){
     if(interrupt()){
         return;
     }
-    velocityX = -INITIAL_VELOCITY_X;
+    velocityX = min(INITIAL_VELOCITY_X / (-2), velocityX - INITIAL_ACCELERATION_X);
+    velocityX = max(-INITIAL_VELOCITY_X, velocityX);
     action = TURT_RUN;
     if(dir == RIGHT){
         cout << "LL" << endl;

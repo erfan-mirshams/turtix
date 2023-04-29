@@ -1,4 +1,5 @@
 #include "../include/general.h"
+#include <string>
 
 int percentage(int per, int amount){
     return (amount * per) / PERCENTAGE_AMOUNT;
@@ -35,4 +36,13 @@ string removeFinalTwoDirsFromPath(string path){
 int calMod(int a, int b){
     a += b;
     return (a % b);
+}
+
+string intToBinaryString(int x){
+    string ans = "";
+    for(int i = 0; i < GRID_DIR_CNT; i++){
+        ans = to_string(x & 1) + ans;
+        x >>= 1;
+    }
+    return ans;
 }

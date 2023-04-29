@@ -1,10 +1,63 @@
 #include "../include/level.h"
 
+int charToEntId(char c){
+    int ans = NA;
+    for(int i = 0; i < ENTITY_CNT; i++){
+        if(c == ENTITY_CHAR[i]){
+            ans = i;
+            break;
+        }
+    }
+    return ans;
+}
+
+void Level::readMap(int ind){
+    string name = path + DIR_DELIM + MAPS_DIR + DIR_DELIM + MAPS_PREFIX + NAME_DELIM + to_string(ind) + MAPS_FORMAT;
+    ifstream inputFile(name);
+    vector<string> readFile;
+    string lineOfFile;
+    int w, h;
+    w = h = 0;
+    while(getline(inputFile, lineOfFile)){
+        h++;
+        readFile.push_back(lineOfFile);
+        w = max(w, (int)lineOfFile.size());
+    }
+    inputFile.close();
+    vector< vector<int> > vec;
+    vector<int> line;
+    for(int i = 0; i < w + 2; i++){
+        line.push_back(NA);
+    }
+    vec.push_back(line);
+    line.clear();
+    for(int i = 0; i < h; i++){
+        line.push_back(NA);
+        for(int j = 0; j < w; j++){
+            if(j < (int)readFile[i].size()){
+                line.push_back(charToEntId(readFile[i][j]));
+            }
+            else{
+                line.push_back(NA);
+            }
+        }
+        line.push_back(NA);
+        vec.push_back(line);
+        line.clear();
+    }
+    for(int i = 0; i < w + 2; i++){
+        line.push_back(NA);
+    }
+    vec.push_back(line);
+    ground = new Ground(path, vec);
+}
+
 Level::Level(RenderWindow* _window, View* _view, Font* _font, string _path){
     window = _window;
     view = _view;
     font = _font;
     path = _path;
+    readMap(2);
     viewOffset = Vector2f(0, 0);
     turtle = new Turtle(path + DIR_DELIM + TEXTURES_DIR);
 }
@@ -34,6 +87,7 @@ void Level::setViewPos(){
 
 void Level::draw(){
     window -> setView(*view);
+    ground -> draw(window);
     window->draw(*(turtle->getSprite()));
     Vector2i pos;
     pos = getPosGrid(turtle->getSprite());
@@ -74,4 +128,5 @@ View* Level::getView(){
 Level::~Level(){
     view -> setCenter(view -> getCenter() - viewOffset);
     delete turtle;
+    delete ground;
 }
