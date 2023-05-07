@@ -5,6 +5,7 @@
 #include "turtle.h"
 #include "ground.h"
 #include "enemy.h"
+#include "baby.h"
 #include <fstream>
 using namespace sf;
 
@@ -30,6 +31,7 @@ class Level{
     Turtle* turtle;
     Ground* ground;
     EnemyList *enemyList;
+    BabyList *babyList;
     RenderWindow* window;
     vector<GridItem> gridPosList;
     Vector2f viewOffset;

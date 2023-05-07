@@ -73,6 +73,7 @@ void Level::readMap(int ind){
     vec.push_back(line);
     ground = new Ground(path, vec);
     enemyList = new EnemyList(path, vec);
+    babyList = new BabyList(path, vec);
 }
 
 Level::Level(RenderWindow* _window, View* _view, Font* _font, string _path){
@@ -112,6 +113,7 @@ void Level::draw(){
     window -> setView(*view);
     ground -> draw(window);
     enemyList -> draw(window);
+    babyList -> draw(window);
     window->draw(*(turtle->getSprite()));
     Vector2i pos;
     pos = getPosGrid(turtle->getSprite());
@@ -154,6 +156,10 @@ void Level::incrementMovements(){
         gridPosList.push_back(GridItem(getPosGrid(enemyList -> enemies[i] -> getSprite()), ENT_ENEMY1, enemyList -> enemies[i] -> getSprite()));
         enemyList -> incrementMovement(i);
     }
+    for(int i = 0; i < (int)babyList -> babies.size(); i++){
+        gridPosList.push_back(GridItem(getPosGrid(babyList -> babies[i] -> getSprite()), ENT_BABY, babyList -> babies[i] -> getSprite()));
+        babyList -> incrementMovement(i);
+    }
     // cout << "GridSz: " << gridPosList.size() << endl;
     for(int i = 0; i < (int)gridPosList.size(); i++) {
         for(int j = i + 1; j < (int)gridPosList.size(); j++){
@@ -167,7 +173,6 @@ void Level::incrementMovements(){
                         turtle -> manageWallImpact(gridPosList[j].sprite);
                     }
                     if(gridPosList[j].type == ENT_ENEMY1 && !turtle -> isGhost()){
-                        cout << "WAAT" << endl;
                         Enemy* enem = enemyList -> enemies[j - 1 - groundSprites.size()];
                         handleEnemyImpact(enem);
                     }
@@ -214,4 +219,5 @@ Level::~Level(){
     delete turtle;
     delete ground;
     delete enemyList;
+    delete babyList;
 }

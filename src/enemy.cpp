@@ -48,7 +48,7 @@ Enemy::Enemy(int l, int r, int gridX, int gridY){
 }
 
 void Enemy::incrementMovement(const vector< vector<Texture*> > &textures){
-    if(!isTicked()){
+    if(!isTicked() || !visible){
         return;
     }
     if(action == ENM_ATTACK && finishedAttack()){

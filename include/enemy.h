@@ -24,7 +24,6 @@ private:
     Clock hurtClock;
     Clock protectClock;
     Sprite* sprite;
-    DIRECTION dir;
     int left;
     int right;
     int velocity;
