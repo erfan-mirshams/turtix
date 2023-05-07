@@ -57,7 +57,7 @@ Level::Level(RenderWindow* _window, View* _view, Font* _font, string _path){
     view = _view;
     font = _font;
     path = _path;
-    readMap(2);
+    readMap(1);
     viewOffset = Vector2f(0, 0);
     turtle = new Turtle(path + DIR_DELIM + TEXTURES_DIR);
 }
@@ -91,11 +91,17 @@ void Level::draw(){
     window->draw(*(turtle->getSprite()));
     Vector2i pos;
     pos = getPosGrid(turtle->getSprite());
-    cout << "POS GRID: " << pos.x << " " << pos.y << endl;
+    // cout << "POS GRID: " << pos.x << " " << pos.y << endl;
     window -> setView(window -> getDefaultView());
 }
 
 void Level::incrementMovements(){
+    vector<Sprite*> groundSprites = ground ->getSprites();
+    for(int i = 0; i < (int)groundSprites.size(); i++){
+        if(areColliding(turtle -> getSprite(), groundSprites[i])){
+            turtle -> manageWallImpact(groundSprites[i]);
+        }
+    }
     turtle -> incrementMovement();
     setViewPos();
 }

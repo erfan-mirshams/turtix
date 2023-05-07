@@ -30,10 +30,11 @@ class Turtle{
     vector< vector<Texture*> > textures;
     Sprite *sprite;
     int accelerationY;
+    bool isTicked();
+    bool onGround;
+    public:
     int velocityY;
     int velocityX;
-    bool isTicked();
-    public:
     Turtle(string path);
     virtual ~Turtle();
     void initializeTextures(string path);
@@ -46,8 +47,9 @@ class Turtle{
     void jump();
     void attack();
     bool interrupt();
-    bool onGround();
+    void turnOnGroundOn();
     bool finishedAttack();
+    void manageWallImpact(Sprite* wall);
 };
 
 #endif // TURTLE_H_

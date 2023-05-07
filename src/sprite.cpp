@@ -97,3 +97,39 @@ Vector2i getPosGrid(Sprite* sprite){
     grid.y /= GRID_SIZE;
     return grid;
 }
+
+bool areColliding(Sprite *sprite1, Sprite *sprite2){
+    return sprite1 -> getGlobalBounds().intersects(sprite2 -> getGlobalBounds());
+}
+
+int whichDirectionAreColliding(Sprite *sprite1, Sprite *sprite2){
+    FloatRect bound1 = sprite1 -> getGlobalBounds();
+    FloatRect bound2 = sprite2 -> getGlobalBounds();
+    float sides[GRID_DIR_CNT];
+
+    sides[BOTTOM] = bound2.top + bound2.height;
+    sides[RIGHT] = bound2.left + bound2.width;
+    sides[TOP] = bound2.top;
+    sides[LEFT] = bound2.left;
+    int intersectionSize[GRID_DIR_CNT];
+    for(int i = 0; i < GRID_DIR_CNT; i++){
+        intersectionSize[i] = 0;
+    }
+    for(int i = sides[LEFT]; i <= sides[RIGHT]; i++){
+        intersectionSize[BOTTOM] += bound1.contains(i, sides[BOTTOM]);
+        intersectionSize[TOP] += bound1.contains(i, sides[TOP]);
+    }
+    for(int i = sides[TOP]; i <= sides[BOTTOM]; i++){
+        intersectionSize[RIGHT] += bound1.contains(sides[RIGHT], i);
+        intersectionSize[LEFT] += bound1.contains(sides[LEFT], i);
+    }
+    int mx = -INF;
+    int mxInd = NA;
+    for(int i = 0; i < GRID_DIR_CNT; i++){
+        if(intersectionSize[i] > mx){
+            mx = intersectionSize[i];
+            mxInd = i;
+        }
+    }
+    return mxInd;
+}

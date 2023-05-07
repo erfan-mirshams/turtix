@@ -1,5 +1,6 @@
 #include "../include/turtle.h"
 #include "../include/general.h"
+#include <SFML/Graphics/Rect.hpp>
 
 void Turtle::initializeTextures(string path){
     textures.resize(ACTIONS_CNT);
@@ -22,13 +23,14 @@ Turtle::Turtle(string path){
     velocityX = 0;
     accelerationY = INITIAL_ACCELERATION_Y;
     sprite = new Sprite();
-    sprite -> setPosition(percentage(50, WIDTH), percentage(40, HEIGHT)); //test
+    sprite -> setPosition(percentage(50, WIDTH), percentage(10, HEIGHT)); //test
     initializeTextures(path);
     sprite -> setScale(TURTLE_ZOOM, TURTLE_ZOOM);
+    onGround = false;
 }
 
 bool Turtle::interrupt(){
-    return (action == TURT_JUMP || action == TURT_ATTACK);
+    return (action == TURT_ATTACK);
 }
 
 bool Turtle::isTicked(){
@@ -39,12 +41,16 @@ bool Turtle::isTicked(){
     return false;
 }
 
-bool Turtle::onGround(){
-    auto rect = sprite -> getGlobalBounds();
-    if(rect.top + rect.height >= percentage(50, HEIGHT)){
-        return true;
-    }
-    return false;
+// bool Turtle::onGround(){
+//     auto rect = sprite -> getGlobalBounds();
+//     if(rect.top + rect.height >= percentage(50, HEIGHT)){
+//         return true;
+//     }
+//     return false;
+// }
+//
+void Turtle::turnOnGroundOn(){
+    onGround = true;
 }
 
 bool Turtle::finishedAttack(){
@@ -57,16 +63,14 @@ void Turtle::incrementMovement(){
     }
     sprite -> move(velocityX, velocityY);
     velocityY += accelerationY;
-    if(onGround()){
-        velocityY = 0;
+    if(onGround){
         jumpCap = INITIAL_JUMP_CAP;
         if(action == TURT_JUMP){
             action = TURT_IDLE;
         }
-        auto rect = sprite -> getGlobalBounds();
-        sprite -> move(0, percentage(50, HEIGHT) - rect.top - rect.height);
     }
     if(finishedAttack()){
+        cout << "WOOW" << endl;
         action = TURT_IDLE;
     }
     spriteInd++;
@@ -77,6 +81,7 @@ void Turtle::incrementMovement(){
         flipSprite(sprite);
         changedDir = false;
     }
+    onGround = false;
 }
 
 void Turtle::moveRight(){
@@ -85,7 +90,9 @@ void Turtle::moveRight(){
     }
     velocityX = max(INITIAL_VELOCITY_X / 2, velocityX + INITIAL_ACCELERATION_X);
     velocityX = min(INITIAL_VELOCITY_X, velocityX);
-    action = TURT_RUN;
+    if(action != TURT_JUMP){
+        action = TURT_RUN;
+    }
     if(dir == LEFT){
         cout << "LL" << endl;
         changedDir = true;
@@ -99,7 +106,9 @@ void Turtle::moveLeft(){
     }
     velocityX = min(INITIAL_VELOCITY_X / (-2), velocityX - INITIAL_ACCELERATION_X);
     velocityX = max(-INITIAL_VELOCITY_X, velocityX);
-    action = TURT_RUN;
+    if(action != TURT_JUMP){
+        action = TURT_RUN;
+    }
     if(dir == RIGHT){
         cout << "LL" << endl;
         changedDir = true;
@@ -109,37 +118,66 @@ void Turtle::moveLeft(){
 
 void Turtle::jump(){
     cout << "HARA" << endl;
-    if(jumpCap == 0 || action == TURT_ATTACK){
+    if(jumpCap == 0 || interrupt()){
         return;
     }
     velocityY = -INITIAL_VELOCITY_Y;
+    sprite -> move(0, velocityY);
     action = TURT_JUMP;
+    onGround = false;
     jumpCap--;
 }
 
 void Turtle::attack(){
-    if(interrupt()){
+    if(interrupt() || action == TURT_JUMP){
         return;
     }
-    velocityX = 0;
+    fixHorizontalMovement();
     action = TURT_ATTACK;
     spriteInd = NA;
 }
 
 void Turtle::fixHorizontalMovement(){
-    if(!interrupt()){
-        velocityX = 0;
+    if(interrupt() || action == TURT_JUMP){
+        return;
     }
+    velocityX = 0;
 }
 
 void Turtle::fixTurtle(){
-    if(!interrupt()){
-        action = TURT_IDLE;
+    if(interrupt()){
+        return;
     }
+
+    action = (abs(velocityY) < 5 * INITIAL_ACCELERATION_Y)? TURT_IDLE : TURT_JUMP;
 }
 
 Sprite* Turtle::getSprite(){
     return sprite;
+}
+
+void Turtle::manageWallImpact(Sprite* wall){
+    FloatRect wallBound = wall -> getGlobalBounds();
+    FloatRect turtBound = sprite -> getGlobalBounds();
+    DIRECTION impactDir = (DIRECTION)whichDirectionAreColliding(sprite, wall);
+    cout << "IMPACT: " << impactDir << endl;
+    if(impactDir == LEFT){
+        sprite -> move(wallBound.left - (turtBound.left + turtBound.width), 0);
+        velocityX /= 2;
+    }
+    if(impactDir == RIGHT){
+        sprite -> move(wallBound.left + wallBound.width - turtBound.left, 0);
+        velocityX /= 2;
+    }
+    if(impactDir == TOP){
+        sprite -> move(0, wallBound.top - (turtBound.top + turtBound.height));
+        turnOnGroundOn();
+        velocityY = 0;
+    }
+    if(impactDir == BOTTOM){
+        sprite -> move(0, wallBound.top + wallBound.height - turtBound.top);
+        velocityY = 0;
+    }
 }
 
 Turtle::~Turtle(){
