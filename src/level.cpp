@@ -11,6 +11,12 @@ int charToEntId(char c){
     return ans;
 }
 
+GridItem::GridItem(Vector2i _pos, ENTITY _type, Sprite* _sprite){
+    pos = _pos;
+    type = _type;
+    sprite = _sprite;
+}
+
 void Level::readMap(int ind){
     string name = path + DIR_DELIM + MAPS_DIR + DIR_DELIM + MAPS_PREFIX + NAME_DELIM + to_string(ind) + MAPS_FORMAT;
     ifstream inputFile(name);
@@ -26,13 +32,21 @@ void Level::readMap(int ind){
     inputFile.close();
     vector< vector<int> > vec;
     vector<int> line;
-    for(int i = 0; i < w + 2; i++){
+    for(int i = 0; i < w + 4; i++){
         line.push_back(NA);
     }
     vec.push_back(line);
     line.clear();
+    line.push_back(NA);
+    for(int i = 0; i < w + 2; i++){
+        line.push_back(ENT_GROUND);
+    }
+    line.push_back(NA);
+    vec.push_back(line);
+    line.clear();
     for(int i = 0; i < h; i++){
         line.push_back(NA);
+        line.push_back(ENT_GROUND);
         for(int j = 0; j < w; j++){
             if(j < (int)readFile[i].size()){
                 line.push_back(charToEntId(readFile[i][j]));
@@ -41,15 +55,24 @@ void Level::readMap(int ind){
                 line.push_back(NA);
             }
         }
+        line.push_back(ENT_GROUND);
         line.push_back(NA);
         vec.push_back(line);
         line.clear();
     }
+    line.push_back(NA);
     for(int i = 0; i < w + 2; i++){
+        line.push_back(ENT_GROUND);
+    }
+    line.push_back(NA);
+    vec.push_back(line);
+    line.clear();
+    for(int i = 0; i < w + 4; i++){
         line.push_back(NA);
     }
     vec.push_back(line);
     ground = new Ground(path, vec);
+    enemyList = new EnemyList(path, vec);
 }
 
 Level::Level(RenderWindow* _window, View* _view, Font* _font, string _path){
@@ -57,7 +80,7 @@ Level::Level(RenderWindow* _window, View* _view, Font* _font, string _path){
     view = _view;
     font = _font;
     path = _path;
-    readMap(1);
+    readMap(2);
     viewOffset = Vector2f(0, 0);
     turtle = new Turtle(path + DIR_DELIM + TEXTURES_DIR);
 }
@@ -88,6 +111,7 @@ void Level::setViewPos(){
 void Level::draw(){
     window -> setView(*view);
     ground -> draw(window);
+    enemyList -> draw(window);
     window->draw(*(turtle->getSprite()));
     Vector2i pos;
     pos = getPosGrid(turtle->getSprite());
@@ -96,13 +120,37 @@ void Level::draw(){
 }
 
 void Level::incrementMovements(){
+    gridPosList.push_back(GridItem(getPosGrid(turtle -> getSprite()), ENT_TURTLE, turtle -> getSprite()));
     vector<Sprite*> groundSprites = ground ->getSprites();
     for(int i = 0; i < (int)groundSprites.size(); i++){
+        gridPosList.push_back(GridItem(getPosGrid(groundSprites[i]), ENT_GROUND, groundSprites[i]));
         if(areColliding(turtle -> getSprite(), groundSprites[i])){
             turtle -> manageWallImpact(groundSprites[i]);
         }
     }
-    turtle -> incrementMovement();
+    for(int i = 0; i < (int)enemyList -> enemies.size(); i++){
+        gridPosList.push_back(GridItem(getPosGrid(enemyList -> enemies[i] -> getSprite()), ENT_ENEMY1, enemyList -> enemies[i] -> getSprite()));
+        enemyList -> incrementMovement(i);
+    }
+    for(int i = 0; i < (int)gridPosList.size(); i++) {
+        if(i){
+            break;
+        }
+        for(int j = i + 1; j < (int)gridPosList.size(); j++){
+            if(gridPosList[i].type == gridPosList[j].type){
+                continue;
+            }
+            if(areGridsAdjacent(gridPosList[i].pos, gridPosList[j].pos) &&
+                areColliding(gridPosList[i].sprite, gridPosList[j].sprite)) {
+                if(gridPosList[i].type == ENT_TURTLE){
+                    if(gridPosList[j].type == ENT_GROUND){
+                        turtle -> manageWallImpact(gridPosList[j].sprite);
+                    }
+                }
+            }
+        }
+    }
+    turtle->incrementMovement();
     setViewPos();
 }
 
@@ -139,4 +187,5 @@ Level::~Level(){
     view -> setCenter(view -> getCenter() - viewOffset);
     delete turtle;
     delete ground;
+    delete enemyList;
 }

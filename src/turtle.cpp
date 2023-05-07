@@ -73,7 +73,6 @@ void Turtle::incrementMovement(){
         }
     }
     if(finishedAttack()){
-        cout << "WOOW" << endl;
         action = TURT_IDLE;
     }
     if(finishedHurt()){
@@ -83,7 +82,6 @@ void Turtle::incrementMovement(){
     spriteInd %= ACTIONS_PIX_CNT[action];
     fitTextureInSprite(sprite, textures[action][spriteInd]);
     if(changedDir){
-        cout << "DONE" << endl;
         flipSprite(sprite);
         changedDir = false;
     }
@@ -100,7 +98,6 @@ void Turtle::moveRight(){
         action = TURT_RUN;
     }
     if(dir == LEFT){
-        cout << "LL" << endl;
         changedDir = true;
     }
     dir = RIGHT;
@@ -116,14 +113,12 @@ void Turtle::moveLeft(){
         action = TURT_RUN;
     }
     if(dir == RIGHT){
-        cout << "LL" << endl;
         changedDir = true;
     }
     dir = LEFT;
 }
 
 void Turtle::jump(){
-    cout << "HARA" << endl;
     if(jumpCap == 0 || interrupt()){
         return;
     }
@@ -174,7 +169,6 @@ void Turtle::manageWallImpact(Sprite* wall){
     FloatRect wallBound = wall -> getGlobalBounds();
     FloatRect turtBound = sprite -> getGlobalBounds();
     DIRECTION impactDir = (DIRECTION)whichDirectionAreColliding(sprite, wall);
-    cout << "IMPACT: " << impactDir << endl;
     if(impactDir == LEFT){
         sprite -> move(wallBound.left - (turtBound.left + turtBound.width), 0);
         velocityX /= 2;

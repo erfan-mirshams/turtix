@@ -4,6 +4,7 @@
 #include "general.h"
 #include "turtle.h"
 #include "ground.h"
+#include "enemy.h"
 #include <fstream>
 using namespace sf;
 
@@ -15,13 +16,22 @@ const char ENTITY_CHAR[ENTITY_CNT] = {'T', '.', '$', 'E', 'M', 'O', '^', '*', 'H
 
 int charToEntId(char c);
 
+struct GridItem{
+    Vector2i pos;
+    Sprite* sprite;
+    ENTITY type;
+    GridItem(Vector2i _pos, ENTITY _type, Sprite* _sprite);
+};
+
 class Level{
     private:
     View* view;
     Font* font;
     Turtle* turtle;
     Ground* ground;
+    EnemyList *enemyList;
     RenderWindow* window;
+    vector<GridItem> gridPosList;
     Vector2f viewOffset;
     string path;
     public:
