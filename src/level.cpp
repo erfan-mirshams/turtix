@@ -119,23 +119,43 @@ void Level::draw(){
     window -> setView(window -> getDefaultView());
 }
 
+void Level::handleEnemyImpact(Enemy *enem){
+  if (enem->isGhost() || !enem->isVisible()) {
+    return;
+  }
+  if (enem->isDead()) {
+    if (turtle->isAttacking()) {
+      enem->dieForGood();
+    }
+    return;
+  }
+  bool impactRes = turtle->manageEnemyImpact(enem -> getSprite());
+  if (enem->canBeHurt() && impactRes) {
+    enem->hurt();
+  } else {
+    turtle->hurt();
+    enem->attack();
+  }
+}
+
 void Level::incrementMovements(){
+    // cout << "YOHOO" << endl;
     gridPosList.push_back(GridItem(getPosGrid(turtle -> getSprite()), ENT_TURTLE, turtle -> getSprite()));
     vector<Sprite*> groundSprites = ground ->getSprites();
+    // cout << "GROUNDSZ: " << groundSprites.size() << endl;
+    // cout << "ENEMYSZ:" << enemyList -> enemies.size() << endl;
     for(int i = 0; i < (int)groundSprites.size(); i++){
         gridPosList.push_back(GridItem(getPosGrid(groundSprites[i]), ENT_GROUND, groundSprites[i]));
-        if(areColliding(turtle -> getSprite(), groundSprites[i])){
-            turtle -> manageWallImpact(groundSprites[i]);
-        }
+        // if(areColliding(turtle -> getSprite(), groundSprites[i])){
+        //     turtle -> manageWallImpact(groundSprites[i]);
+        // }
     }
     for(int i = 0; i < (int)enemyList -> enemies.size(); i++){
         gridPosList.push_back(GridItem(getPosGrid(enemyList -> enemies[i] -> getSprite()), ENT_ENEMY1, enemyList -> enemies[i] -> getSprite()));
         enemyList -> incrementMovement(i);
     }
+    // cout << "GridSz: " << gridPosList.size() << endl;
     for(int i = 0; i < (int)gridPosList.size(); i++) {
-        if(i){
-            break;
-        }
         for(int j = i + 1; j < (int)gridPosList.size(); j++){
             if(gridPosList[i].type == gridPosList[j].type){
                 continue;
@@ -146,10 +166,16 @@ void Level::incrementMovements(){
                     if(gridPosList[j].type == ENT_GROUND){
                         turtle -> manageWallImpact(gridPosList[j].sprite);
                     }
+                    if(gridPosList[j].type == ENT_ENEMY1 && !turtle -> isGhost()){
+                        cout << "WAAT" << endl;
+                        Enemy* enem = enemyList -> enemies[j - 1 - groundSprites.size()];
+                        handleEnemyImpact(enem);
+                    }
                 }
             }
         }
     }
+    gridPosList.clear();
     turtle->incrementMovement();
     setViewPos();
 }

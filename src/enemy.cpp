@@ -18,6 +18,13 @@ bool Enemy::isTicked(){
     return false;
 }
 
+bool Enemy::isTickedGhost(){
+    if(hurtClock.getElapsedTime() >= GHOST_TIME){
+        return true;
+    }
+    return false;
+}
+
 bool Enemy::protectTicked(){
     if(protectClock.getElapsedTime() >= PROTECT_TIME){
         return true;
@@ -28,13 +35,16 @@ bool Enemy::protectTicked(){
 Enemy::Enemy(int l, int r, int gridX, int gridY){
     left = l;
     right = r;
+    visible = true;
     velocity = ENEMY_VELOCITY;
     isMortal = true;
+    life = ENEMY_INITIAL_LIFE;
     action = ENM_RUN;
     spriteInd = 0;
     sprite = new Sprite();
     sprite -> setPosition(gridX * GRID_SIZEF, gridY * GRID_SIZEF);
     sprite -> setScale(ENEMY_ZOOM, ENEMY_ZOOM);
+    sprite -> setColor(ENEMY_COLOR);
 }
 
 void Enemy::incrementMovement(const vector< vector<Texture*> > &textures){
@@ -42,13 +52,27 @@ void Enemy::incrementMovement(const vector< vector<Texture*> > &textures){
         return;
     }
     if(action == ENM_ATTACK && finishedAttack()){
-        action = ENM_RUN;
+        protect();
     }
-    if(action == ENM_HURT && finishedHurt()){
-        action = ENM_RUN;
+    if(action == ENM_HURT){
+        if(isTickedGhost()){
+            action = ENM_RUN;
+            Color tempCol = sprite -> getColor();
+            tempCol.a = COLOR_SIZE;
+            sprite -> setColor(tempCol);
+        }
+        else{
+            flicker(sprite);
+        }
     }
     if(action == ENM_DIE && finishedDie()){
-        return;
+        if(isTickedGhost()){
+            life = 1;
+            action = ENM_RUN;
+        }
+        else{
+            return;
+        }
     }
     spriteInd++;
     spriteInd %= ENM_ACTIONS_PIX_CNT[action];
@@ -62,7 +86,12 @@ void Enemy::incrementMovement(const vector< vector<Texture*> > &textures){
         velocity = -velocity;
         isMortal = true;
     }
-    sprite -> move(velocity, 0);
+    if(action == ENM_RUN){
+        sprite -> move(velocity, 0);
+    }
+    if(action == ENM_ATTACK){
+        return;
+    }
     int x = sprite -> getPosition().x;
     if(x < left || x > right){
         protect();
@@ -74,22 +103,34 @@ void Enemy::attack(){
     spriteInd = NA;
 }
 
+bool Enemy::isGhost(){
+    return action == ENM_HURT;
+}
+
 void Enemy::hurt(){
+    life--;
+    if(life <= 0){
+        die();
+        return;
+    }
     action = ENM_HURT;
     spriteInd = NA;
+    ghostMode();
+    cout << "HURT:\n";
+}
+
+void Enemy::ghostMode(){
+    hurtClock.restart();
 }
 
 void Enemy::die(){
     action = ENM_DIE;
+    hurtClock.restart();
     spriteInd = NA;
 }
 
 bool Enemy::finishedAttack(){
     return (spriteInd == ENM_ACTIONS_PIX_CNT[ENM_ATTACK] - 1);
-}
-
-bool Enemy::finishedHurt(){
-    return (spriteInd == ENM_ACTIONS_PIX_CNT[ENM_HURT] - 1);
 }
 
 bool Enemy::finishedDie(){
@@ -102,8 +143,24 @@ void Enemy::protect(){
     protectClock.restart();
 }
 
+bool Enemy::canBeHurt(){
+    return isMortal;
+}
+
+bool Enemy::isDead(){
+    return action == ENM_DIE;
+}
+
+bool Enemy::isVisible(){
+    return visible;
+}
+
 Sprite* Enemy::getSprite(){
     return sprite;
+}
+
+void Enemy::dieForGood(){
+    visible = false;
 }
 
 Enemy::~Enemy(){
@@ -111,7 +168,6 @@ Enemy::~Enemy(){
 }
 
 EnemyList::EnemyList(string _path, vector< vector<int> > mp){
-    cout << "IN" << endl;
     _path += DIR_DELIM + TEXTURES_DIR + DIR_DELIM + ENEMY_DIR;
     path = _path;
     initializeTextures();
@@ -140,7 +196,9 @@ void EnemyList::incrementMovement(int ind){
 
 void EnemyList::draw(RenderWindow *window){
     for(int i = 0; i < (int)enemies.size(); i++){
-        window -> draw(*(enemies[i] -> getSprite()));
+        if(enemies[i] -> isVisible()){
+            window -> draw(*(enemies[i] -> getSprite()));
+        }
     }
 }
 

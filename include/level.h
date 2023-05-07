@@ -45,6 +45,7 @@ class Level{
     void vKeyPress();
     void setViewPos();
     void fixTurtle();
+    void handleEnemyImpact(Enemy* enem);
     void incrementMovements();
     void draw();
     void readMap(int ind);

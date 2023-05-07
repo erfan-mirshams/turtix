@@ -20,8 +20,9 @@ const float TURTLE_ZOOM = 2;
 enum ACTION {TURT_IDLE, TURT_RUN, TURT_JUMP, TURT_ATTACK, TURT_HURT};
 
 class Turtle{
-    private:
+private:
     Clock clock;
+    Clock flickerClock;
     DIRECTION dir;
     bool changedDir;
     int action;
@@ -30,9 +31,9 @@ class Turtle{
     vector< vector<Texture*> > textures;
     Sprite *sprite;
     int accelerationY;
-    bool isTicked();
     bool onGround;
-    public:
+    bool ghost;
+public:
     int velocityY;
     int velocityX;
     Turtle(string path);
@@ -51,7 +52,13 @@ class Turtle{
     void turnOnGroundOn();
     bool finishedAttack();
     bool finishedHurt();
+    void ghostMode();
     void manageWallImpact(Sprite* wall);
+    bool manageEnemyImpact(Sprite* enemy);
+    bool isTicked();
+    bool isTickedGhost();
+    bool isGhost();
+    bool isAttacking();
 };
 
 #endif // TURTLE_H_

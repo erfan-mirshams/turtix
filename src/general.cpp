@@ -48,8 +48,8 @@ string intToBinaryString(int x){
 }
 
 bool areGridsAdjacent(Vector2i v, Vector2i w){
-    for(int i = -1; i <= 1; i++){
-        for(int j = -1; j <= 1; j++){
+    for(int i = -2; i <= 2; i++){
+        for(int j = -2; j <= 2; j++){
             if(v.x + i == w.x && v.y + j == w.y){
                 return true;
             }

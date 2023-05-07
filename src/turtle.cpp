@@ -26,6 +26,7 @@ Turtle::Turtle(string path){
     initializeTextures(path);
     sprite -> setScale(TURTLE_ZOOM, TURTLE_ZOOM);
     onGround = false;
+    ghost = false;
 }
 
 bool Turtle::interrupt(){
@@ -35,6 +36,14 @@ bool Turtle::interrupt(){
 bool Turtle::isTicked(){
     if(clock.getElapsedTime() >= TICKING_TIME){
         clock.restart();
+        return true;
+    }
+    return false;
+}
+
+bool Turtle::isTickedGhost(){
+    if(flickerClock.getElapsedTime() >= GHOST_TIME){
+        ghost = false;
         return true;
     }
     return false;
@@ -60,9 +69,23 @@ bool Turtle::finishedHurt(){
     return (action == TURT_HURT && spriteInd == ACTIONS_PIX_CNT[TURT_HURT] - 1);
 }
 
+bool Turtle::isAttacking(){
+    return (action == TURT_ATTACK);
+}
+
 void Turtle::incrementMovement(){
     if(action == NA || !isTicked()){
         return;
+    }
+    if(ghost){
+        if(!isTickedGhost()){
+            flicker(sprite);
+        }
+        else{
+            Color tempCol = sprite -> getColor();
+            tempCol.a = COLOR_SIZE;
+            sprite -> setColor(tempCol);
+        }
     }
     sprite -> move(velocityX, velocityY);
     velocityY += accelerationY;
@@ -138,11 +161,17 @@ void Turtle::attack(){
     spriteInd = NA;
 }
 
+void Turtle::ghostMode(){
+    ghost = true;
+    flickerClock.restart();
+}
+
 void Turtle::hurt(){
-    if(interrupt()){
+    if(interrupt() || ghost){
         return;
     }
     action = TURT_HURT;
+    ghostMode();
     spriteInd = NA;
 }
 
@@ -186,6 +215,23 @@ void Turtle::manageWallImpact(Sprite* wall){
         sprite -> move(0, wallBound.top + wallBound.height - turtBound.top);
         velocityY = 0;
     }
+}
+
+bool Turtle::isGhost(){
+    return ghost;
+}
+
+bool Turtle::manageEnemyImpact(Sprite *enemy){
+    cout << "IN GERE" << endl;
+    FloatRect enemBound = enemy -> getGlobalBounds();
+    FloatRect turtBound = sprite -> getGlobalBounds();
+    DIRECTION impactDir = (DIRECTION)whichDirectionAreColliding(sprite, enemy);
+    if(impactDir == TOP){
+        velocityY = -INITIAL_VELOCITY_Y;
+        sprite -> move(0, enemBound.top - (turtBound.top + turtBound.height));
+        return true;
+    }
+    return false;
 }
 
 Turtle::~Turtle(){

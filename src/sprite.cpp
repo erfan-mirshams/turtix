@@ -133,3 +133,9 @@ int whichDirectionAreColliding(Sprite *sprite1, Sprite *sprite2){
     }
     return mxInd;
 }
+
+void flicker(Sprite* sprite){
+    Color tempCol = sprite -> getColor();
+    tempCol.a = COLOR_SIZE - randomIntBetween(0, COLOR_SIZE / 2);
+    sprite -> setColor(tempCol);
+}

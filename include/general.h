@@ -10,6 +10,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <SFML/Window.hpp>
+const int COLOR_SIZE = 255;
 const int WIDTH = 1920;
 const int HEIGHT = 1080;
 const int MAX_PATH_SIZE = 2048;
@@ -22,6 +23,7 @@ const int DIRY[GRID_DIR_CNT] = {1, 0, -1, 0};
 const int NA = -1;
 const float GRID_SIZEF = static_cast<float>(GRID_SIZE);
 const float INF = 1e6;
+const sf::Time GHOST_TIME = sf::seconds(4);
 const sf::Time TICKING_TIME = sf::milliseconds(70);
 const sf::Time LEVEL_TIMEOUT = sf::seconds(0.75);
 const std::string EXEC_LINK_PATH = "/proc/self/exe";
