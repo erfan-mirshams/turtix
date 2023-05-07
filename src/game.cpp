@@ -1,5 +1,6 @@
 #include "../include/general.h"
 #include "../include/game.h"
+#include <SFML/Window/Keyboard.hpp>
 
 void Game::initVariables(){
     endGame = false;
@@ -71,6 +72,9 @@ void Game::levelHandleEvent() {
         }
         if (sfmlEvent.key.code == Keyboard::Space) {
             level -> SpaceKeyPress();
+        }
+        if (sfmlEvent.key.code == Keyboard::V){
+            level -> vKeyPress();
         }
     }
 }

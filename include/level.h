@@ -32,6 +32,7 @@ class Level{
     void leftKeyPress();
     void upKeyPress();
     void SpaceKeyPress();
+    void vKeyPress();
     void setViewPos();
     void fixTurtle();
     void incrementMovements();

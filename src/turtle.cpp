@@ -1,6 +1,5 @@
 #include "../include/turtle.h"
 #include "../include/general.h"
-#include <SFML/Graphics/Rect.hpp>
 
 void Turtle::initializeTextures(string path){
     textures.resize(ACTIONS_CNT);
@@ -30,7 +29,7 @@ Turtle::Turtle(string path){
 }
 
 bool Turtle::interrupt(){
-    return (action == TURT_ATTACK);
+    return (action == TURT_ATTACK || action == TURT_HURT);
 }
 
 bool Turtle::isTicked(){
@@ -57,6 +56,10 @@ bool Turtle::finishedAttack(){
     return (action == TURT_ATTACK && spriteInd == ACTIONS_PIX_CNT[TURT_ATTACK] - 1);
 }
 
+bool Turtle::finishedHurt(){
+    return (action == TURT_HURT && spriteInd == ACTIONS_PIX_CNT[TURT_HURT] - 1);
+}
+
 void Turtle::incrementMovement(){
     if(action == NA || !isTicked()){
         return;
@@ -71,6 +74,9 @@ void Turtle::incrementMovement(){
     }
     if(finishedAttack()){
         cout << "WOOW" << endl;
+        action = TURT_IDLE;
+    }
+    if(finishedHurt()){
         action = TURT_IDLE;
     }
     spriteInd++;
@@ -134,6 +140,14 @@ void Turtle::attack(){
     }
     fixHorizontalMovement();
     action = TURT_ATTACK;
+    spriteInd = NA;
+}
+
+void Turtle::hurt(){
+    if(interrupt()){
+        return;
+    }
+    action = TURT_HURT;
     spriteInd = NA;
 }
 

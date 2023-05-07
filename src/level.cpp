@@ -127,6 +127,10 @@ void Level::leftKeyPress(){
     turtle -> moveLeft();
 }
 
+void Level::vKeyPress(){
+    turtle -> hurt();
+}
+
 View* Level::getView(){
     return view;
 }
