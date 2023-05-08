@@ -89,7 +89,7 @@ void Turtle::incrementMovement(){
     }
     sprite -> move(velocityX, velocityY);
     velocityY += accelerationY;
-    velocityY = min(velocityY, 3 * INITIAL_VELOCITY_Y);
+    velocityY = min(velocityY, 2 * INITIAL_VELOCITY_Y);
     if(onGround){
         jumpCap = INITIAL_JUMP_CAP;
         if(action == TURT_JUMP){

@@ -1,4 +1,5 @@
 #include "../include/baby.h"
+#include <SFML/Graphics/Rect.hpp>
 
 void BabyList::initializeTextures(){
     textures.resize(BB_ACTIONS_CNT);
@@ -30,19 +31,27 @@ void Baby::respawn(){
     action = BB_IDLE;
     sprite -> setPosition(initPosGrid.x * GRID_SIZEF, initPosGrid.y * GRID_SIZEF);
     spriteInd = 0;
+    velocityY = 0;
 }
 
 Baby::Baby(int x, int y){
     initPosGrid = Vector2i(x, y);
     visible = true;
     dir = RIGHT;
-    velocity = BB_INITIAL_VELOCITY;
+    velocityX = BB_INITIAL_VELOCITY;
     sprite = new Sprite();
     respawn();
     sprite -> setScale(BB_ZOOM, BB_ZOOM);
 }
 
+bool Baby::isActive(){
+    return (action == BB_RUN);
+}
+
 void Baby::die(){
+    if(!isActive()){
+        return;
+    }
     action = BB_DIE;
     spriteInd = NA;
 }
@@ -58,13 +67,15 @@ void Baby::incrementMovement(const vector<vector<Texture *>> &textures){
     if(action == BB_DIE && finishedDie()){
         respawn();
     }
-    cout << "INJA?" << endl;
     spriteInd++;
     spriteInd %= BB_ACTIONS_PIX_CNT[action];
     fitTextureInSprite(sprite, textures[action][spriteInd]);
-    if(action == BB_RUN){
-        sprite -> move(velocity, 0);
+    if(action == BB_RUN && velocityY == 0){
+        sprite -> move(velocityX, 0);
     }
+    sprite -> move(0, velocityY);
+    velocityY += BB_INITIAL_ACCELERATION;
+    velocityY = min(velocityY, 2 * BB_INITIAL_VELOCITY);
 }
 
 void Baby::setDir(DIRECTION _d){
@@ -72,12 +83,46 @@ void Baby::setDir(DIRECTION _d){
         return;
     }
     if(_d == LEFT){
-        velocity = -BB_INITIAL_VELOCITY;
+        velocityX = -BB_INITIAL_VELOCITY;
         dir = LEFT;
     }
     if(_d == RIGHT){
-        velocity = BB_INITIAL_VELOCITY;
+        velocityX = BB_INITIAL_VELOCITY;
         dir = RIGHT;
+    }
+    flipSprite(sprite);
+}
+
+void Baby::manageWallImpact(Sprite *wall){
+    FloatRect wallBound = wall -> getGlobalBounds();
+    FloatRect babBound = sprite -> getGlobalBounds();
+    DIRECTION impactDir = (DIRECTION)whichDirectionAreColliding(sprite, wall);
+    if(impactDir == LEFT){
+        sprite -> move(wallBound.left - (babBound.left + babBound.width), 0);
+        setDir(LEFT);
+    }
+    if(impactDir == RIGHT){
+        sprite -> move(wallBound.left + wallBound.width - babBound.left, 0);
+        setDir(RIGHT);
+    }
+    if(impactDir == TOP){
+        sprite -> move(0, wallBound.top - (babBound.top + babBound.height));
+        velocityY = 0;
+    }
+}
+
+void Baby::manageTurtleImpact(Sprite *turt){
+    FloatRect turtBound = turt -> getGlobalBounds();
+    FloatRect babBound = sprite -> getGlobalBounds();
+    DIRECTION impactDir = (DIRECTION)whichDirectionAreColliding(sprite, turt);
+    action = BB_RUN;
+    if(impactDir == LEFT){
+        sprite -> move(turtBound.left - (babBound.left + babBound.width), 0);
+        setDir(LEFT);
+    }
+    if(impactDir == RIGHT){
+        sprite -> move(turtBound.left + turtBound.width - babBound.left, 0);
+        setDir(RIGHT);
     }
 }
 
@@ -86,7 +131,6 @@ Baby::~Baby(){
 }
 
 BabyList::BabyList(string _path, vector< vector<int> > mp){
-    cout << "IN" << endl;
     _path += DIR_DELIM + TEXTURES_DIR + DIR_DELIM + BB_DIR;
     path = _path;
     initializeTextures();

@@ -7,7 +7,8 @@
 using namespace std;
 using namespace sf;
 
-const int BB_INITIAL_VELOCITY = 15;
+const int BB_INITIAL_VELOCITY = 20;
+const int BB_INITIAL_ACCELERATION = 2;
 const int BB_ACTIONS_CNT = 3;
 const int BB_ACTIONS_PIX_CNT[BB_ACTIONS_CNT] = {5, 8, 4};
 const string BB_DIR = "baby";
@@ -21,7 +22,8 @@ private:
     Clock clock;
     Sprite* sprite;
     Vector2i initPosGrid;
-    int velocity;
+    int velocityX;
+    int velocityY;
     int spriteInd;
     BB_ACTION action;
     bool visible;
@@ -32,8 +34,11 @@ public:
     void incrementMovement(const vector< vector<Texture*> > &textures);
     void die();
     bool finishedDie();
+    bool isActive();
     Sprite* getSprite();
     void respawn();
+    void manageWallImpact(Sprite* wall);
+    void manageTurtleImpact(Sprite* turt);
     void setDir(DIRECTION _d);
     Baby(int x, int y);
     virtual ~Baby();

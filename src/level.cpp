@@ -146,19 +146,16 @@ void Level::incrementMovements(){
     vector<Sprite*> groundSprites = ground ->getSprites();
     // cout << "GROUNDSZ: " << groundSprites.size() << endl;
     // cout << "ENEMYSZ:" << enemyList -> enemies.size() << endl;
+    for(int i = 0; i < (int)babyList -> babies.size(); i++){
+        gridPosList.push_back(GridItem(getPosGrid(babyList -> babies[i] -> getSprite()), ENT_BABY, babyList -> babies[i] -> getSprite()));
+        babyList -> incrementMovement(i);
+    }
     for(int i = 0; i < (int)groundSprites.size(); i++){
         gridPosList.push_back(GridItem(getPosGrid(groundSprites[i]), ENT_GROUND, groundSprites[i]));
-        // if(areColliding(turtle -> getSprite(), groundSprites[i])){
-        //     turtle -> manageWallImpact(groundSprites[i]);
-        // }
     }
     for(int i = 0; i < (int)enemyList -> enemies.size(); i++){
         gridPosList.push_back(GridItem(getPosGrid(enemyList -> enemies[i] -> getSprite()), ENT_ENEMY1, enemyList -> enemies[i] -> getSprite()));
         enemyList -> incrementMovement(i);
-    }
-    for(int i = 0; i < (int)babyList -> babies.size(); i++){
-        gridPosList.push_back(GridItem(getPosGrid(babyList -> babies[i] -> getSprite()), ENT_BABY, babyList -> babies[i] -> getSprite()));
-        babyList -> incrementMovement(i);
     }
     // cout << "GridSz: " << gridPosList.size() << endl;
     for(int i = 0; i < (int)gridPosList.size(); i++) {
@@ -173,8 +170,26 @@ void Level::incrementMovements(){
                         turtle -> manageWallImpact(gridPosList[j].sprite);
                     }
                     if(gridPosList[j].type == ENT_ENEMY1 && !turtle -> isGhost()){
-                        Enemy* enem = enemyList -> enemies[j - 1 - groundSprites.size()];
+                        Enemy* enem = enemyList -> enemies[j - 1 - groundSprites.size() - babyList -> babies.size()];
                         handleEnemyImpact(enem);
+                    }
+                    if(gridPosList[j].type == ENT_BABY && !turtle -> isGhost()){
+                        Baby* babe = babyList -> babies[j - 1];
+                        babe -> manageTurtleImpact(turtle -> getSprite());
+                    }
+                }
+                if(gridPosList[i].type == ENT_BABY){
+                    Baby* babe = babyList -> babies[i - 1];
+                    if(gridPosList[j].type == ENT_GROUND){
+                        babe -> manageWallImpact(gridPosList[j].sprite);
+                    }
+                    if(!babe -> isActive()){
+                        continue;
+                    }
+                    if(gridPosList[j].type == ENT_ENEMY1){
+                        Enemy* enem = enemyList -> enemies[j - 1 - groundSprites.size() - babyList -> babies.size()];
+                        babe -> die();
+                        enem -> attack();
                     }
                 }
             }
