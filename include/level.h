@@ -2,6 +2,7 @@
 #define LEVEL_H_
 
 #include "general.h"
+#include "menu.h"
 #include "turtle.h"
 #include "ground.h"
 #include "enemy.h"
@@ -11,11 +12,18 @@
 using namespace std;
 using namespace sf;
 
+const Color LOSE_COLOR = Color(147, 14, 36, 0);
+const Color WIN_COLOR = Color(11, 183, 157, 0);
+const Color LEVEL_BACKGROUND_COLOR = Color::Black;
 const string MAPS_DIR = "maps";
 const string MAPS_PREFIX = "map";
 const string MAPS_FORMAT = ".txt";
+const string LOSE_MESSAGE = "Game Over";
+const string WIN_MESSAGE = "Congrats";
+const int OPACITY_STEP = 5;
 const int ENTITY_CNT = 11;
 const int NUMBER_OF_LEVELS = 2;
+const int LEVEL_FONT_SZ = FONT_SZ + 20;
 const char ENTITY_CHAR[ENTITY_CNT] = {'T', '.', '$', 'E', 'M', 'O', '^', '*', 'H', '|', 'B'};
 
 int charToEntId(char c);
@@ -42,6 +50,7 @@ class Level{
     Vector2f viewOffset;
     string path;
     int rescued;
+    Text msgText;
     public:
     View* getView();
     Level(RenderWindow* _window, View* _view, Font* _font, string _path);
@@ -60,6 +69,11 @@ class Level{
     void lose();
     void win();
     void tidyUp();
+    void loseMessage();
+    void winMessage();
+    void fixTextPosition();
+    void textRender();
+    void incrementMsg();
 };
 
 #endif // LEVEL_H_

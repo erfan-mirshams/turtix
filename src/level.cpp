@@ -1,5 +1,6 @@
 #include "../include/level.h"
 #include <SFML/System/Vector2.hpp>
+#include <string>
 
 int charToEntId(char c){
     int ans = NA;
@@ -90,6 +91,8 @@ Level::Level(RenderWindow* _window, View* _view, Font* _font, string _path){
     view = _view;
     font = _font;
     path = _path;
+    msgText.setFont(*font);
+    msgText.setCharacterSize(LEVEL_FONT_SZ);
     levelNum = 0;
     readMap(levelNum);
 }
@@ -228,11 +231,13 @@ void Level::incrementMovements(){
 }
 
 void Level::lose(){
+    loseMessage();
     tidyUp();
     readMap(levelNum);
 }
 
 void Level::win(){
+    winMessage();
     if(levelNum + 1 < NUMBER_OF_LEVELS){
         tidyUp();
         levelNum++;
@@ -276,6 +281,46 @@ void Level::tidyUp(){
     delete enemyList;
     delete babyList;
     delete portal;
+}
+
+void Level::textRender(){
+    window -> clear(LEVEL_BACKGROUND_COLOR);
+    window -> setView(*view);
+    window -> draw(msgText);
+    window -> setView(window -> getDefaultView());
+    window -> display();
+}
+
+void Level::incrementMsg(){
+    Clock tmpClock1, tmpClock2;
+    while(tmpClock1.getElapsedTime() < MSG_TIME){
+        if(tmpClock2.getElapsedTime() >= TICKING_TIME){
+            tmpClock2.restart();
+            Color tempCol = msgText.getFillColor();
+            tempCol.a = min(COLOR_SIZE, tempCol.a + OPACITY_STEP);
+            msgText.setFillColor(tempCol);
+            textRender();
+        }
+    }
+}
+
+void Level::winMessage(){
+    msgText.setString(WIN_MESSAGE + " ;) You Completed Level " + to_string(levelNum + 1));
+    msgText.setFillColor(WIN_COLOR);
+    fixTextPosition();
+    incrementMsg();
+}
+
+void Level::loseMessage(){
+    msgText.setString(LOSE_MESSAGE);
+    msgText.setFillColor(LOSE_COLOR);
+    fixTextPosition();
+    incrementMsg();
+}
+
+void Level::fixTextPosition(){
+    FloatRect rect = msgText.getLocalBounds();
+    msgText.setPosition(viewOffset.x + (WIDTH - rect.width) / 2, viewOffset.y + (HEIGHT - rect.height) / 2);
 }
 
 Level::~Level(){
