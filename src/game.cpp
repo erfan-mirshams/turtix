@@ -59,7 +59,7 @@ void Game::levelHandleEvent() {
             sfmlEvent.key.code == Keyboard::H) {
             level -> leftKeyPress();
         }
-        if (sfmlEvent.key.code == Keyboard::Q){
+        if (sfmlEvent.key.code == Keyboard::P){
             mode = IT_MENU;
         }
     }

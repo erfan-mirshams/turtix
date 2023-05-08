@@ -16,6 +16,7 @@ Turtle::Turtle(string path, Vector2f pos){
     changedDir = false;
     path += DIR_DELIM + TEXTURES_DIR;
     jumpCap = 0;
+    life = TURT_INITIAL_LIFE;
     path += DIR_DELIM + TURTLE_DIR;
     action = TURT_IDLE;
     spriteInd = 0;
@@ -31,7 +32,7 @@ Turtle::Turtle(string path, Vector2f pos){
 }
 
 bool Turtle::interrupt(){
-    return (action == TURT_ATTACK || action == TURT_HURT);
+    return (action == TURT_ATTACK || action == TURT_HURT || action == TURT_DIE);
 }
 
 bool Turtle::isTicked(){
@@ -74,8 +75,12 @@ bool Turtle::isAttacking(){
     return (action == TURT_ATTACK);
 }
 
+bool Turtle::isDead(){
+    return (action == TURT_DIE && finishedDie());
+}
+
 void Turtle::incrementMovement(){
-    if(action == NA || !isTicked()){
+    if(isDead() || !isTicked()){
         return;
     }
     if(ghost){
@@ -172,9 +177,23 @@ void Turtle::hurt(){
     if(interrupt() || ghost){
         return;
     }
+    life--;
+    if(life == 0){
+        die();
+        return;
+    }
     action = TURT_HURT;
     ghostMode();
     spriteInd = NA;
+}
+
+void Turtle::die(){
+    action = TURT_DIE;
+    spriteInd = NA;
+}
+
+bool Turtle::finishedDie(){
+    return (spriteInd == ACTIONS_PIX_CNT[TURT_DIE] - 1);
 }
 
 void Turtle::fixHorizontalMovement(){
@@ -188,7 +207,6 @@ void Turtle::fixTurtle(){
     if(interrupt()){
         return;
     }
-
     action = (abs(velocityY) < 5 * INITIAL_ACCELERATION_Y)? TURT_IDLE : TURT_JUMP;
 }
 

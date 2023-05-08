@@ -23,6 +23,7 @@ void Level::readMap(int ind){
     ifstream inputFile(name);
     vector<string> readFile;
     string lineOfFile;
+    rescued = 0;
     int w, h;
     w = h = 0;
     while(getline(inputFile, lineOfFile)){
@@ -89,7 +90,8 @@ Level::Level(RenderWindow* _window, View* _view, Font* _font, string _path){
     view = _view;
     font = _font;
     path = _path;
-    readMap(2);
+    levelNum = 0;
+    readMap(levelNum);
 }
 
 void Level::setViewPos(){
@@ -189,7 +191,11 @@ void Level::incrementMovements(){
                 if(gridPosList[i].type == ENT_PORTAL){
                     if(gridPosList[j].type == ENT_BABY){
                         Baby* babe = babyList -> babies[j - 2];
-                        babe -> managePortalImpact();
+                        if(babe -> isVisible()){
+                            babe -> managePortalImpact();
+                            rescued++;
+                            cout << "RESCUED: " << rescued << endl;
+                        }
                     }
                 }
                 if(gridPosList[i].type == ENT_BABY){
@@ -212,7 +218,26 @@ void Level::incrementMovements(){
     gridPosList.clear();
     portal -> incrementMovement();
     turtle->incrementMovement();
+    if(rescued == (int)babyList -> babies.size()){
+        win();
+    }
+    if(turtle -> isDead()){
+        lose();
+    }
     setViewPos();
+}
+
+void Level::lose(){
+    tidyUp();
+    readMap(levelNum);
+}
+
+void Level::win(){
+    if(levelNum + 1 < NUMBER_OF_LEVELS){
+        tidyUp();
+        levelNum++;
+        readMap(levelNum);
+    }
 }
 
 void Level::fixTurtle(){
@@ -244,11 +269,15 @@ View* Level::getView(){
     return view;
 }
 
-Level::~Level(){
+void Level::tidyUp(){
     view -> setCenter(view -> getCenter() - viewOffset);
     delete turtle;
     delete ground;
     delete enemyList;
     delete babyList;
     delete portal;
+}
+
+Level::~Level(){
+    tidyUp();
 }
