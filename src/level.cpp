@@ -130,7 +130,6 @@ void Level::draw(){
     window->draw(*(turtle->getSprite()));
     Vector2i pos;
     pos = getPosGrid(turtle->getSprite());
-    // cout << "POS GRID: " << pos.x << " " << pos.y << endl;
     window -> setView(window -> getDefaultView());
 }
 
@@ -154,12 +153,9 @@ void Level::handleEnemyImpact(Enemy *enem){
 }
 
 void Level::incrementMovements(){
-    // cout << "YOHOO" << endl;
     gridPosList.push_back(GridItem(getPosGrid(turtle -> getSprite()), ENT_TURTLE, turtle -> getSprite()));
     gridPosList.push_back(GridItem(getPosGrid(portal -> getSprite()), ENT_PORTAL, portal -> getSprite()));
     vector<Sprite*> groundSprites = ground ->getSprites();
-    // cout << "GROUNDSZ: " << groundSprites.size() << endl;
-    // cout << "ENEMYSZ:" << enemyList -> enemies.size() << endl;
     for(int i = 0; i < (int)babyList -> babies.size(); i++){
         gridPosList.push_back(GridItem(getPosGrid(babyList -> babies[i] -> getSprite()), ENT_BABY, babyList -> babies[i] -> getSprite()));
         babyList -> incrementMovement(i);
@@ -171,7 +167,6 @@ void Level::incrementMovements(){
         gridPosList.push_back(GridItem(getPosGrid(enemyList -> enemies[i] -> getSprite()), ENT_ENEMY1, enemyList -> enemies[i] -> getSprite()));
         enemyList -> incrementMovement(i);
     }
-    // cout << "GridSz: " << gridPosList.size() << endl;
     for(int i = 0; i < (int)gridPosList.size(); i++) {
         for(int j = i + 1; j < (int)gridPosList.size(); j++){
             if(gridPosList[i].type == gridPosList[j].type){
@@ -198,7 +193,6 @@ void Level::incrementMovements(){
                         if(babe -> isVisible()){
                             babe -> managePortalImpact();
                             rescued++;
-                            cout << "RESCUED: " << rescued << endl;
                         }
                     }
                 }
@@ -212,6 +206,9 @@ void Level::incrementMovements(){
                     }
                     if(gridPosList[j].type == ENT_ENEMY1){
                         Enemy* enem = enemyList -> enemies[j - 2 - groundSprites.size() - babyList -> babies.size()];
+                        if(enem -> isDead() || !enem -> isVisible()){
+                            continue;
+                        }
                         babe -> die();
                         enem -> attack();
                     }

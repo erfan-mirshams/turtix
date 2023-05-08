@@ -51,14 +51,6 @@ bool Turtle::isTickedGhost(){
     return false;
 }
 
-// bool Turtle::onGround(){
-//     auto rect = sprite -> getGlobalBounds();
-//     if(rect.top + rect.height >= percentage(50, HEIGHT)){
-//         return true;
-//     }
-//     return false;
-// }
-//
 void Turtle::turnOnGroundOn(){
     onGround = true;
 }
@@ -242,7 +234,6 @@ bool Turtle::isGhost(){
 }
 
 bool Turtle::manageEnemyImpact(Sprite *enemy){
-    cout << "IN GERE" << endl;
     FloatRect enemBound = enemy -> getGlobalBounds();
     FloatRect turtBound = sprite -> getGlobalBounds();
     DIRECTION impactDir = (DIRECTION)whichDirectionAreColliding(sprite, enemy);

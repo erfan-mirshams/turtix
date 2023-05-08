@@ -149,7 +149,6 @@ BabyList::BabyList(string _path, vector< vector<int> > mp){
             if(mp[i][j] != ENT_BABY){
                 continue;
             }
-            cout << ":: " << i << " " << j << endl;
             babies.push_back(new Baby(j, i));
         }
     }

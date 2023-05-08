@@ -116,7 +116,6 @@ void Enemy::hurt(){
     action = ENM_HURT;
     spriteInd = NA;
     ghostMode();
-    cout << "HURT:\n";
 }
 
 void Enemy::ghostMode(){
@@ -184,7 +183,6 @@ EnemyList::EnemyList(string _path, vector< vector<int> > mp){
             while(mp[i + 1][r + 1] == ENT_GROUND && mp[i][r + 1] == NA){
                 r++;
             }
-            cout << "ENM: " << l << " " << r << " " << j << " " << i << endl;
             enemies.push_back(new Enemy(l * GRID_SIZE, r * GRID_SIZE, j, i));
         }
     }

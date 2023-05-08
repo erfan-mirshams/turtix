@@ -27,7 +27,6 @@ Ground::Ground(string _path, vector< vector<int> > mp){
             fitTextureInSprite(sprites[k], textures[state]);
             sprites[k] -> setScale(sprites[k] -> getScale() * zoom);
             sprites[k] -> setPosition(j * GRID_SIZE, i * GRID_SIZE);
-            // cout << ": " << i << " " << j  << " " << intToBinaryString(state) << endl;
         }
     }
 }
