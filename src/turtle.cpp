@@ -11,9 +11,10 @@ void Turtle::initializeTextures(string path){
     }
 }
 
-Turtle::Turtle(string path){
+Turtle::Turtle(string path, Vector2f pos){
     dir = RIGHT;
     changedDir = false;
+    path += DIR_DELIM + TEXTURES_DIR;
     jumpCap = 0;
     path += DIR_DELIM + TURTLE_DIR;
     action = TURT_IDLE;
@@ -22,7 +23,7 @@ Turtle::Turtle(string path){
     velocityX = 0;
     accelerationY = INITIAL_ACCELERATION_Y;
     sprite = new Sprite();
-    sprite -> setPosition(percentage(50, WIDTH), percentage(10, HEIGHT)); //test
+    sprite -> setPosition(pos);
     initializeTextures(path);
     sprite -> setScale(TURTLE_ZOOM, TURTLE_ZOOM);
     onGround = false;

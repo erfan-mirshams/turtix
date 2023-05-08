@@ -94,6 +94,9 @@ void Baby::setDir(DIRECTION _d){
 }
 
 void Baby::manageWallImpact(Sprite *wall){
+    if(!isVisible()){
+        return;
+    }
     FloatRect wallBound = wall -> getGlobalBounds();
     FloatRect babBound = sprite -> getGlobalBounds();
     DIRECTION impactDir = (DIRECTION)whichDirectionAreColliding(sprite, wall);
@@ -112,6 +115,9 @@ void Baby::manageWallImpact(Sprite *wall){
 }
 
 void Baby::manageTurtleImpact(Sprite *turt){
+    if(!isVisible()){
+        return;
+    }
     FloatRect turtBound = turt -> getGlobalBounds();
     FloatRect babBound = sprite -> getGlobalBounds();
     DIRECTION impactDir = (DIRECTION)whichDirectionAreColliding(sprite, turt);
@@ -124,6 +130,10 @@ void Baby::manageTurtleImpact(Sprite *turt){
         sprite -> move(turtBound.left + turtBound.width - babBound.left, 0);
         setDir(RIGHT);
     }
+}
+
+void Baby::managePortalImpact(){
+    visible = false;
 }
 
 Baby::~Baby(){

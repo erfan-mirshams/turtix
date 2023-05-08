@@ -39,6 +39,7 @@ public:
     void respawn();
     void manageWallImpact(Sprite* wall);
     void manageTurtleImpact(Sprite* turt);
+    void managePortalImpact();
     void setDir(DIRECTION _d);
     Baby(int x, int y);
     virtual ~Baby();

@@ -36,7 +36,7 @@ private:
 public:
     int velocityY;
     int velocityX;
-    Turtle(string path);
+    Turtle(string path, Vector2f pos);
     virtual ~Turtle();
     void initializeTextures(string path);
     void moveRight();

@@ -6,6 +6,7 @@
 #include "ground.h"
 #include "enemy.h"
 #include "baby.h"
+#include "portal.h"
 #include <fstream>
 using namespace sf;
 
@@ -30,8 +31,9 @@ class Level{
     Font* font;
     Turtle* turtle;
     Ground* ground;
-    EnemyList *enemyList;
-    BabyList *babyList;
+    EnemyList* enemyList;
+    BabyList* babyList;
+    Portal* portal;
     RenderWindow* window;
     vector<GridItem> gridPosList;
     Vector2f viewOffset;

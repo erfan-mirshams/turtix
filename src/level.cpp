@@ -1,4 +1,5 @@
 #include "../include/level.h"
+#include <SFML/System/Vector2.hpp>
 
 int charToEntId(char c){
     int ans = NA;
@@ -74,6 +75,13 @@ void Level::readMap(int ind){
     ground = new Ground(path, vec);
     enemyList = new EnemyList(path, vec);
     babyList = new BabyList(path, vec);
+    portal = new Portal(path, vec);
+    turtle = new Turtle(path, portal -> getSprite() -> getPosition());
+    Vector2f turtPos = static_cast<Vector2f>(getPosWindow(turtle -> getSprite()));
+    turtPos.x -= percentage(WIDTH, 50);
+    turtPos.y -= percentage(HEIGHT, 50);
+    viewOffset = turtPos;
+    view -> setCenter(view -> getCenter() + viewOffset);
 }
 
 Level::Level(RenderWindow* _window, View* _view, Font* _font, string _path){
@@ -82,8 +90,6 @@ Level::Level(RenderWindow* _window, View* _view, Font* _font, string _path){
     font = _font;
     path = _path;
     readMap(2);
-    viewOffset = Vector2f(0, 0);
-    turtle = new Turtle(path + DIR_DELIM + TEXTURES_DIR);
 }
 
 void Level::setViewPos(){
@@ -111,6 +117,7 @@ void Level::setViewPos(){
 
 void Level::draw(){
     window -> setView(*view);
+    window -> draw(*(portal -> getSprite()));
     ground -> draw(window);
     enemyList -> draw(window);
     babyList -> draw(window);
@@ -143,6 +150,7 @@ void Level::handleEnemyImpact(Enemy *enem){
 void Level::incrementMovements(){
     // cout << "YOHOO" << endl;
     gridPosList.push_back(GridItem(getPosGrid(turtle -> getSprite()), ENT_TURTLE, turtle -> getSprite()));
+    gridPosList.push_back(GridItem(getPosGrid(portal -> getSprite()), ENT_PORTAL, portal -> getSprite()));
     vector<Sprite*> groundSprites = ground ->getSprites();
     // cout << "GROUNDSZ: " << groundSprites.size() << endl;
     // cout << "ENEMYSZ:" << enemyList -> enemies.size() << endl;
@@ -170,16 +178,22 @@ void Level::incrementMovements(){
                         turtle -> manageWallImpact(gridPosList[j].sprite);
                     }
                     if(gridPosList[j].type == ENT_ENEMY1 && !turtle -> isGhost()){
-                        Enemy* enem = enemyList -> enemies[j - 1 - groundSprites.size() - babyList -> babies.size()];
+                        Enemy* enem = enemyList -> enemies[j - 2 - groundSprites.size() - babyList -> babies.size()];
                         handleEnemyImpact(enem);
                     }
                     if(gridPosList[j].type == ENT_BABY && !turtle -> isGhost()){
-                        Baby* babe = babyList -> babies[j - 1];
+                        Baby* babe = babyList -> babies[j - 2];
                         babe -> manageTurtleImpact(turtle -> getSprite());
                     }
                 }
+                if(gridPosList[i].type == ENT_PORTAL){
+                    if(gridPosList[j].type == ENT_BABY){
+                        Baby* babe = babyList -> babies[j - 2];
+                        babe -> managePortalImpact();
+                    }
+                }
                 if(gridPosList[i].type == ENT_BABY){
-                    Baby* babe = babyList -> babies[i - 1];
+                    Baby* babe = babyList -> babies[i - 2];
                     if(gridPosList[j].type == ENT_GROUND){
                         babe -> manageWallImpact(gridPosList[j].sprite);
                     }
@@ -187,7 +201,7 @@ void Level::incrementMovements(){
                         continue;
                     }
                     if(gridPosList[j].type == ENT_ENEMY1){
-                        Enemy* enem = enemyList -> enemies[j - 1 - groundSprites.size() - babyList -> babies.size()];
+                        Enemy* enem = enemyList -> enemies[j - 2 - groundSprites.size() - babyList -> babies.size()];
                         babe -> die();
                         enem -> attack();
                     }
@@ -196,6 +210,7 @@ void Level::incrementMovements(){
         }
     }
     gridPosList.clear();
+    portal -> incrementMovement();
     turtle->incrementMovement();
     setViewPos();
 }
@@ -235,4 +250,5 @@ Level::~Level(){
     delete ground;
     delete enemyList;
     delete babyList;
+    delete portal;
 }
