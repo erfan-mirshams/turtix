@@ -52,6 +52,7 @@ class Game{
         void levelHandleEvent();
         void levelUpdate();
         void levelRender();
+        void newLevel();
 };
 
 

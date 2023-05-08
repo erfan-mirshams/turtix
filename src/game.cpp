@@ -62,6 +62,9 @@ void Game::levelHandleEvent() {
         if (sfmlEvent.key.code == Keyboard::P){
             mode = IT_MENU;
         }
+        if (sfmlEvent.key.code == Keyboard::Q){
+            newLevel();
+        }
     }
     if (sfmlEvent.type == Event::KeyReleased) {
         keyPressed = true;
@@ -75,6 +78,9 @@ void Game::levelHandleEvent() {
         }
         if (sfmlEvent.key.code == Keyboard::V){
             level -> vKeyPress();
+        }
+        if (sfmlEvent.key.code == Keyboard::R){
+            level -> restartCurrentLevel();
         }
     }
 }
@@ -112,9 +118,16 @@ void Game::update(){
     }
     if(mode == IT_PLAY){
         levelUpdate();
+        if(level -> isFinished()){
+            newLevel();
+        }
     }
-    else{
-    }
+}
+
+void Game::newLevel(){
+    delete level;
+    level = new Level(window, view, font, path);
+    mode = IT_MENU;
 }
 
 bool Game::isTicked(){

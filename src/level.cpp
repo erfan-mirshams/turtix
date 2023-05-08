@@ -91,6 +91,7 @@ Level::Level(RenderWindow* _window, View* _view, Font* _font, string _path){
     view = _view;
     font = _font;
     path = _path;
+    finishLevels = false;
     msgText.setFont(*font);
     msgText.setCharacterSize(LEVEL_FONT_SZ);
     levelNum = 0;
@@ -230,6 +231,10 @@ void Level::incrementMovements(){
     setViewPos();
 }
 
+bool Level::isFinished(){
+    return finishLevels;
+}
+
 void Level::lose(){
     loseMessage();
     tidyUp();
@@ -242,6 +247,9 @@ void Level::win(){
         tidyUp();
         levelNum++;
         readMap(levelNum);
+    }
+    else{
+        finishLevels = true;
     }
 }
 
@@ -309,6 +317,11 @@ void Level::winMessage(){
     msgText.setFillColor(WIN_COLOR);
     fixTextPosition();
     incrementMsg();
+}
+
+void Level::restartCurrentLevel(){
+    tidyUp();
+    readMap(levelNum);
 }
 
 void Level::loseMessage(){

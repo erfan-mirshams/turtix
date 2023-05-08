@@ -22,7 +22,7 @@ const string LOSE_MESSAGE = "Game Over";
 const string WIN_MESSAGE = "Congrats";
 const int OPACITY_STEP = 5;
 const int ENTITY_CNT = 11;
-const int NUMBER_OF_LEVELS = 2;
+const int NUMBER_OF_LEVELS = 1;
 const int LEVEL_FONT_SZ = FONT_SZ + 20;
 const char ENTITY_CHAR[ENTITY_CNT] = {'T', '.', '$', 'E', 'M', 'O', '^', '*', 'H', '|', 'B'};
 
@@ -51,6 +51,7 @@ class Level{
     string path;
     int rescued;
     Text msgText;
+    bool finishLevels;
     public:
     View* getView();
     Level(RenderWindow* _window, View* _view, Font* _font, string _path);
@@ -74,6 +75,8 @@ class Level{
     void fixTextPosition();
     void textRender();
     void incrementMsg();
+    bool isFinished();
+    void restartCurrentLevel();
 };
 
 #endif // LEVEL_H_
