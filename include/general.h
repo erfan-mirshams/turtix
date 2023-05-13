@@ -43,4 +43,5 @@ string getExecutablePath();
 string removeFinalTwoDirsFromPath(string path);
 string intToBinaryString(int x);
 bool areGridsAdjacent(Vector2i v, Vector2i w);
+bool isTicked(Clock &clock, const Time &t);
 #endif // GENERAL_H_

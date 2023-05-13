@@ -8,8 +8,8 @@ using namespace sf;
 
 const int INITIAL_JUMP_CAP = 2;
 const int TURT_INITIAL_LIFE = 3;
-const int INITIAL_VELOCITY_Y = 30;
-const int INITIAL_ACCELERATION_Y = 2;
+const int INITIAL_VELOCITY_Y = 40;
+const int INITIAL_ACCELERATION_Y = 5;
 const int INITIAL_ACCELERATION_X = 5;
 const int INITIAL_VELOCITY_X = 30;
 const int ACTIONS_CNT = 6;
@@ -60,8 +60,6 @@ public:
     void ghostMode();
     void manageWallImpact(Sprite* wall);
     bool manageEnemyImpact(Sprite* enemy);
-    bool isTicked();
-    bool isTickedGhost();
     bool isGhost();
     bool isAttacking();
 };

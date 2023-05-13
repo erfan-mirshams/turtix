@@ -57,3 +57,11 @@ bool areGridsAdjacent(Vector2i v, Vector2i w){
     }
     return false;
 }
+
+bool isTicked(Clock &clock, const Time &t){
+    if(clock.getElapsedTime() >= t){
+        clock.restart();
+        return true;
+    }
+    return false;
+}

@@ -35,21 +35,6 @@ bool Turtle::interrupt(){
     return (action == TURT_ATTACK || action == TURT_HURT || action == TURT_DIE);
 }
 
-bool Turtle::isTicked(){
-    if(clock.getElapsedTime() >= TICKING_TIME){
-        clock.restart();
-        return true;
-    }
-    return false;
-}
-
-bool Turtle::isTickedGhost(){
-    if(flickerClock.getElapsedTime() >= GHOST_TIME){
-        ghost = false;
-        return true;
-    }
-    return false;
-}
 
 void Turtle::turnOnGroundOn(){
     onGround = true;
@@ -72,14 +57,15 @@ bool Turtle::isDead(){
 }
 
 void Turtle::incrementMovement(){
-    if(isDead() || !isTicked()){
+    if(isDead() || !isTicked(clock, TICKING_TIME)){
         return;
     }
     if(ghost){
-        if(!isTickedGhost()){
+        if(!isTicked(flickerClock, GHOST_TIME)){
             flicker(sprite);
         }
         else{
+            ghost = false;
             Color tempCol = sprite -> getColor();
             tempCol.a = COLOR_SIZE;
             sprite -> setColor(tempCol);
@@ -87,7 +73,7 @@ void Turtle::incrementMovement(){
     }
     sprite -> move(velocityX, velocityY);
     velocityY += accelerationY;
-    velocityY = min(velocityY, 2 * INITIAL_VELOCITY_Y);
+    velocityY = min(velocityY, INITIAL_VELOCITY_Y);
     if(onGround){
         jumpCap = INITIAL_JUMP_CAP;
         if(action == TURT_JUMP){
@@ -144,6 +130,7 @@ void Turtle::jump(){
     if(jumpCap == 0 || interrupt()){
         return;
     }
+    fixHorizontalMovement();
     velocityY = -INITIAL_VELOCITY_Y;
     sprite -> move(0, velocityY);
     action = TURT_JUMP;
@@ -189,7 +176,7 @@ bool Turtle::finishedDie(){
 }
 
 void Turtle::fixHorizontalMovement(){
-    if(interrupt() || action == TURT_JUMP){
+    if(interrupt()){
         return;
     }
     velocityX = 0;

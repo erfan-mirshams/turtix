@@ -22,7 +22,6 @@ private:
 public:
     void loadTextures();
     void incrementMovement();
-    bool isTicked();
     Sprite* getSprite();
     Portal(string _path, const vector< vector<int> > &mp);
     virtual ~Portal();

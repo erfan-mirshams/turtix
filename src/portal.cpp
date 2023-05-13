@@ -31,20 +31,12 @@ Portal::Portal(string _path, const vector< vector<int> > &mp){
     spriteInd = 0;
 }
 
-bool Portal::isTicked(){
-    if(clock.getElapsedTime() >= TICKING_TIME){
-        clock.restart();
-        return true;
-    }
-    return false;
-}
-
 Sprite* Portal::getSprite(){
     return sprite;
 }
 
 void Portal::incrementMovement(){
-    if(!isTicked()){
+    if(!isTicked(clock, TICKING_TIME)){
         return;
     }
     spriteInd++;
